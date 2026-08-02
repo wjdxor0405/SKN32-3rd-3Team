@@ -279,6 +279,10 @@ def _load_from_db(db=None) -> list[dict]:
                     # 법령은 조문 단위 분할을 위해 평문 하나만 쓴다
                     "content": parts[0] if source_type == "law" else "\n\n".join(parts),
                     "source_type": source_type,
+                    # 파일 경로와 달리 DB 경로는 region 을 채우지 않아
+                    # 모든 문서가 "common" 으로 인덱싱되던 버그 수정.
+                    # (지역 필터가 무력화되어 타 지역 가이드가 검색되던 문제)
+                    "region": _extract_region(row.title or ""),
                 }
             )
 
