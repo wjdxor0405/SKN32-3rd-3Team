@@ -1,6 +1,6 @@
 # data/laws — 법령 원문 보관 폴더
 
-`python -m scripts.seed_laws` 가 이 폴더의 파일을 읽어
+`python -m scripts.seed_docs` 가 이 폴더의 파일을 읽어
 `documents` 테이블에 `source_type="law"` 로 적재한다.
 
 ## 지원 형식
