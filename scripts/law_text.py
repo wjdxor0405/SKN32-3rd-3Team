@@ -134,3 +134,39 @@ def _join_wrapped_lines(lines: list[str]) -> str:
 def count_articles(text: str) -> int:
     """본문에서 인식된 조문 수. 추출이 제대로 됐는지 확인하는 지표."""
     return len(re.findall(r"제\s*\d+\s*조(?:의\s*\d+)?\s*[(（]", text))
+
+
+# ─────────────────── 시행일 검사 ───────────────────
+
+# 법령 헤더의 "[시행 2026. 5. 12.]" 표기
+EFFECTIVE_DATE = re.compile(r"\[시행\s*(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})\.?\s*\]")
+
+# 시행예정 중복판 마커: "[시행일: 2027. 1. 8.] 제9조"
+FUTURE_VERSION_MARKER = re.compile(r"^\[시행일:\s*[\d\.\s]+\]\s*제\d+조", re.MULTILINE)
+
+
+def check_effective_date(text: str, fname: str) -> None:
+    """법령 헤더의 시행일을 오늘과 비교해 시행예정판·구버전 여부를 경고한다.
+
+    law.go.kr 에서 시행예정판을 복사해 오는 실수를 적재 로그에서 잡기 위한 것.
+    자동으로 고치지는 않는다 — 조문 0개 경고와 같은 철학.
+    """
+    from datetime import date
+
+    m = EFFECTIVE_DATE.search(text[:500])  # 헤더 부근만 검사
+    if not m:
+        print(f"  [참고] {fname}: 시행일 표기([시행 YYYY. M. D.])가 없습니다. 버전 확인 권장")
+        return
+
+    eff = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+    today = date.today()
+
+    if eff > today:
+        print(f"  [경고] {fname}: 시행일 {eff} — 아직 시행 전(시행예정판)입니다.")
+        print("         law.go.kr 에서 '현행' 표시가 붙은 판을 다시 받으세요.")
+    elif (today - eff).days > 365 * 3:
+        print(f"  [참고] {fname}: 시행일 {eff} — 3년 이상 경과. 개정 여부 확인 권장")
+
+    if FUTURE_VERSION_MARKER.search(text):
+        print(f"  [경고] {fname}: 시행예정 중복 조문([시행일: …] 제N조)이 남아 있습니다.")
+        print("         같은 조문이 두 번 인덱싱되어 인용이 꼬일 수 있으니 미래판 블록을 제거하세요.")

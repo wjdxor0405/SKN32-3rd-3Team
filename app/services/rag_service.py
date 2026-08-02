@@ -143,7 +143,7 @@ def ask(
     return {
         "answer": sections.get("answer", ""),
         "tip": sections.get("tip", ""),
-        "source": ", ".join(s["title"] for s in source_list),
+        "source": ", ".join(dict.fromkeys(s["title"] for s in source_list)),
         "sources": source_list,
     }
 

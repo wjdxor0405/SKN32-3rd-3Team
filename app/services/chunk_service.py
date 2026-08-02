@@ -20,10 +20,19 @@ import re
 from app.core.config import settings
 
 # "제15조(정의)", "제15조 (정의)", "제15조의2(...)" 앞에서 자르기 위한 패턴
-ARTICLE_SPLIT = re.compile(r"(?=제\s*\d+\s*조(?:의\s*\d+)?\s*[(（])")
+# 별표(예: "별표 1. …")도 독립 청크가 되도록 경계에 포함한다.
+# 그러지 않으면 별표 전체가 마지막 조문(예: 제16조) 라벨로 인덱싱되어
+# LLM이 별표 내용을 엉뚱한 조문으로 인용하게 된다.
+ARTICLE_SPLIT = re.compile(
+    r"(?=제\s*\d+\s*조(?:의\s*\d+)?\s*[(（])"
+    r"|(?=\n\s*별\s*표\s*\d+)"
+)
 
 # 청크 앞머리에서 조문 번호만 뽑아내는 패턴 → "제15조", "제15조의2"
 ARTICLE_LABEL = re.compile(r"^제\s*(\d+)\s*조(?:의\s*(\d+))?")
+
+# 청크 앞머리의 별표 번호 → "별표 1"
+ANNEX_LABEL = re.compile(r"^별\s*표\s*(\d+)")
 
 # 가이드 문서의 큰 구획: "=== 품목별 분리배출 요령 ==="
 SECTION_HEADER = re.compile(r"^\s*=+\s*(.+?)\s*=+\s*$")
@@ -96,8 +105,14 @@ def split_by_article(text: str) -> list[str]:
 
 
 def extract_article_label(text: str) -> str | None:
-    """청크 앞머리에서 조문 번호를 뽑아냅니다. 예) "제15조", "제15조의2" """
-    match = ARTICLE_LABEL.match(text.strip())
+    """청크 앞머리에서 조문/별표 번호를 뽑아냅니다. 예) "제15조", "제15조의2", "별표 1" """
+    stripped = text.strip()
+
+    annex = ANNEX_LABEL.match(stripped)
+    if annex:
+        return f"별표 {annex.group(1)}"
+
+    match = ARTICLE_LABEL.match(stripped)
     if not match:
         return None
     if match.group(2):

@@ -26,7 +26,7 @@ from app.core.config import settings
 from app.database import Base, SessionLocal, engine
 from app.models import Document, SourceType, User
 from app.services import rag_service
-from scripts.law_text import count_articles, read_law_file
+from scripts.law_text import check_effective_date, count_articles, read_law_file
 
 SYSTEM_EMAIL = "system@local"
 SYSTEM_PASSWORD = "seed-only-change-me"
@@ -120,6 +120,7 @@ def load_folder(folder, source_type: str) -> list[tuple[str, str, str]]:
                 print("         일반 문자 단위로 분할되어 조문 인용이 어려울 수 있습니다.")
             else:
                 print(f"  법령  : {title} — 조문 {articles}개, {len(text):,}자")
+            check_effective_date(text, path.name)
         else:
             print(f"  가이드: {title} — {len(text):,}자")
 
@@ -180,6 +181,24 @@ def main() -> None:
                 action = "추가"
 
             print(f"  {action}: [{source_type}] {title}")
+
+        # ── 동기화: 폴더에서 사라진 공용 문서는 DB에서도 지운다 ──
+        # 파일명·첫 줄(제목)을 바꾸면 새 문서로 적재되고 옛 레코드가 남아
+        # 잘못된 제목으로 인용되는 사고를 막는다.
+        # 시스템 계정 소유의 law/guide 문서만 대상이므로 사용자 업로드 문서는 건드리지 않는다.
+        seeded_titles = {title for title, _, _ in docs}
+        stale = (
+            db.query(Document)
+            .filter(
+                Document.owner_id == owner.id,
+                Document.source_type.in_([SourceType("law"), SourceType("guide")]),
+                Document.title.notin_(seeded_titles),
+            )
+            .all()
+        )
+        for doc in stale:
+            print(f"  삭제: [{doc.source_type.value}] {doc.title} (폴더에 없음)")
+            db.delete(doc)
 
         db.commit()
 
