@@ -156,13 +156,15 @@ def judge(expect: dict, results: list[dict]) -> tuple[bool, str]:
     if mc := expect.get("max_article_versions"):
         # 같은 조문 "헤더"로 시작하는 청크가 2개면 현행판+미래판 중복 혼입.
         # 긴 조문의 하위분할("제41조 (이어서)")은 정상이므로 세지 않는다.
+        # 주의: 공백 제거 시 "제41조 (이어서)" 도 "제41조(" 로 시작하므로
+        #       "(이어서" 는 명시적으로 제외한다.
         header, limit = mc
-        n = sum(
-            1 for r in results
-            if r.get("content", "").strip().replace(" ", "").startswith(
-                header.replace(" ", "")
-            )
-        )
+        header_flat = header.replace(" ", "")
+        n = 0
+        for r in results:
+            head = r.get("content", "").strip().replace(" ", "")[:30]
+            if head.startswith(header_flat) and not head.startswith(header_flat + "이어서"):
+                n += 1
         hit = n <= limit
         ok &= hit
         reasons.append(f"조문헤더'{header}' {n}개{'○' if hit else '(중복판!)×'}")
