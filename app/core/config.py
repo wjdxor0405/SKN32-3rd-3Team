@@ -60,14 +60,14 @@ class Settings(BaseSettings):
     # (개발 단계 전용) MySQL 연결 전 문서를 읽어올 임시 폴더
     DOCS_DIR: Path = BASE_DIR / "data" / "docs"
 
-    # 내부 가이드 문서 폴더 (분리배출 가이드 등)
+    # 가이드 문서 폴더 (환경부·지자체 분리배출 안내문).
+    # 시드 스크립트(seed_docs)의 적재 대상이자 관리자 업로드 저장처이며,
+    # RAG_SOURCE=files 모드의 검색 경로이기도 하다.
+    # ※ 과거 GUIDES_DIR(data/guides)와 이원화되어 있던 것을 data/guide 로 통일함 (2026-08-03)
     GUIDE_DIR: Path = BASE_DIR / "data" / "guide"
 
     # 법령 원문 txt 폴더 (시드 적재 스크립트가 읽는 곳)
     LAWS_DIR: Path = BASE_DIR / "data" / "laws"
-
-    # 기관 배출 가이드 폴더 (환경부·지자체 안내문)
-    GUIDES_DIR: Path = BASE_DIR / "data" / "guides"
 
     # 유사도 임계값. 이 점수 미만이면 근거 없음으로 보고 LLM을 호출하지 않는다.
     # (환각 방지 1차 장치)

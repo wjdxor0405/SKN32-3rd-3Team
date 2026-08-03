@@ -8,7 +8,7 @@
   1. 시스템 계정 + 로그인용 데모 계정을 만든다
      (documents.owner_id 가 NOT NULL 이고, 프론트에 회원가입 화면이 없기 때문)
   2. data/laws/*   → source_type="law"   (조문 단위로 청킹)
-     data/guides/* → source_type="guide" (품목 블록 단위로 청킹)
+     data/guide/*  → source_type="guide" (품목 블록 단위로 청킹)
   3. 벡터 인덱스를 재생성한다
 
 지원 형식: .txt / .md / .pdf (PDF는 머리말·페이지번호를 자동 제거)
@@ -133,7 +133,7 @@ def load_public_docs() -> list[tuple[str, str, str]]:
     """법령·가이드 폴더를 모두 읽는다."""
     return (
         load_folder(settings.LAWS_DIR, "law")
-        + load_folder(settings.GUIDES_DIR, "guide")
+        + load_folder(settings.GUIDE_DIR, "guide")
     )
 
 
@@ -147,7 +147,7 @@ def main() -> None:
     docs = load_public_docs()
 
     if not docs:
-        print(f"[중단] {settings.LAWS_DIR} 와 {settings.GUIDES_DIR} 에 파일이 없습니다.")
+        print(f"[중단] {settings.LAWS_DIR} 와 {settings.GUIDE_DIR} 에 파일이 없습니다.")
         print("       txt·md·pdf 를 넣은 뒤 다시 실행하세요.")
         return
 

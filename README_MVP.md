@@ -8,7 +8,7 @@
 
 ### 신규
 ```
-scripts/seed_laws.py          법령 적재 + 인덱스 생성 + 계정 생성
+scripts/seed_docs.py          법령 적재 + 인덱스 생성 + 계정 생성
 scripts/law_text.py           PDF·txt 추출 및 정제 (머리말·페이지번호 제거)
 scripts/create_user.py        로그인 계정 생성 (회원가입 화면 대용)
 data/laws/*                   법령 원문 (샘플 포함 — 실제 조문으로 교체 필요)
@@ -85,7 +85,7 @@ EMBEDDING_BACKEND=gemini
 ```
 
 > ⚠️ **임베딩 백엔드를 바꾸면 벡터 차원이 384 → 768 로 달라진다.**
-> 반드시 `python -m scripts.seed_laws` 를 다시 실행할 것.
+> 반드시 `python -m scripts.seed_docs` 를 다시 실행할 것.
 
 **키가 없어도 서버는 뜬다.** 답변 자리에 검색된 조문 원문이 그대로 나온다.
 
@@ -98,7 +98,7 @@ EMBEDDING_BACKEND=gemini
 1. 국가법령정보센터(law.go.kr)에서 법령 검색
 2. 조문 본문 복사
 3. `자원순환기본법.txt` 처럼 저장 (**파일명이 곧 문서 제목**, UTF-8)
-4. `[샘플]…` `테스트_…` 파일 삭제 후 `python -m scripts.seed_laws` 재실행
+4. `[샘플]…` `테스트_…` 파일 삭제 후 `python -m scripts.seed_docs` 재실행
 
 조문은 `제1조(목적)` 형식을 지켜야 조문 단위 청킹이 동작한다.
 
