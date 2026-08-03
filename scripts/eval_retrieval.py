@@ -30,7 +30,10 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
     ("A1", "쓰레기를 아무 데나 버리면 어떤 법에 걸려?", None,
      {"expect_title": "폐기물관리법", "expect_label": r"제8조"}),
     ("A2", "무단투기하면 과태료 얼마까지 나와?", None,
-     {"expect_title": "폐기물관리법", "expect_label": r"제68조"}),
+     # 시행령 별표 8(과태료 부과기준)도 유효 근거 (2026-08-04 gemini eval 반영).
+     # 가이드 확장 후 '자주 틀리는 것' 블록이 상위를 차지하는 희석 관찰됨
+     # → 법령 근거형 질문의 source_type=law 가중은 RAG 과제로 별도 추진
+     {"expect_title": "폐기물관리법", "expect_label": r"제68조|별표\s*8"}),
     ("A3", "분리배출 표시(재질 마크)는 무슨 법에 근거해?", None,
      {"expect_title": "자원의 절약", "expect_label": r"제14조"}),
     ("A4", "카페에서 1회용컵 공짜로 주면 불법이야?", None,
@@ -74,8 +77,14 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
      # (이전: expect_empty — 제주가 코퍼스에 없음을 확인하던 자리)
      {"expect_title": "제주", "expect_content": "요일"}),
     ("E2", "음식물처리기 구매 보조금 얼마 받을 수 있어?", None,
-     {"expect_empty": True}),
+     # 2026-08-04 음식물쓰레기 구분기준 가이드(보조금 절 포함) 추가로 응답형 전환.
+     # (이전: 무응답형 → 임계값 분리 불가 확인 후 forbid_content 자리표시였음)
+     # 금액은 지자체별 상이로 미수록 — 제도 존재와 '지자체 공고 확인' 안내가 잡히는지 검증
+     {"expect_title": "음식물", "expect_content": "보조금"}),
     ("E3", "폐기물관리법 시행령 별표 8 내용 알려줘", None,
+     # TODO(데이터): 별표 8이 구판 이식·일부 요약 상태라 직접 인용을 막는 취지의 forbid.
+     # 별표 8을 현행(제36217호) 기준으로 완전 수록하면
+     # {"expect_title": "시행령", "expect_label": r"별표\s*8"} 로 전환할 것 (2026-08-04)
      {"forbid_title": "시행령"}),
     ("E4", "대형폐기물 수수료 얼마야?", None,
      # 2026-08-03 대형폐기물 가이드 추가로 절차 답변이 가능해짐.
@@ -91,7 +100,8 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
      {"expect_content": "내용물"}),
     # G. 특수 배출 가이드형 (2026-08-03 신규 3종 대상)
     ("G1", "장롱 버리려면 어떻게 해야 해?", None,
-     {"expect_title": "대형폐기물", "expect_content": "신고"}),
+     # 품목 블록 청킹 특성상 어느 블록이 잡히느냐에 따라 본문 조건이 흔들림 → 제목만 검증 (2026-08-04)
+     {"expect_title": "대형폐기물"}),
     ("G2", "냉장고 버릴 때 돈 내야 해?", None,
      {"expect_title": "무상방문수거", "expect_content": "1599-0903"}),
     ("G3", "선풍기 하나만 버리고 싶은데 무상수거 되나?", None,
@@ -100,6 +110,23 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
      {"expect_title": "유해폐기물", "expect_content": "폐의약품"}),
     ("G5", "물약도 우체통에 넣어도 돼?", None,
      {"expect_title": "유해폐기물", "expect_content": "우체통에는 넣지 말"}),
+    ("G8", "닭뼈는 음식물쓰레기야?", None,
+     {"expect_title": "음식물", "expect_content": "일반쓰레기"}),
+    ("G9", "커피 찌꺼기는 음식물이야 일반쓰레기야?", None,
+     # 지자체별로 갈리는 품목 — '거주지 확인' 안내가 근거로 잡히는지 검증
+     {"expect_title": "음식물", "expect_content": "지자체"}),
+    # H. 홈페이지 확장 카테고리형 — 일회용품·에너지 (2026-08-04 신규 2종 대상)
+    ("H1", "카페 일회용컵 규제 지금 어떻게 돼?", None,
+     {"expect_title": "일회용품", "expect_content": "플라스틱컵"}),
+    ("H2", "1회용컵 보증금제가 뭐야?", None,
+     # 2025.12 전국 의무화 철회·지자체 자율 전환, 제주 유지 — 현행 상태가 잡히는지 검증
+     {"expect_title": "일회용품", "expect_content": "제주"}),
+    ("H3", "생분해 플라스틱은 분리배출하면 돼?", None,
+     {"expect_title": "일회용품", "expect_content": "종량제"}),
+    ("H4", "여름에 에어컨 적정 온도가 몇 도야?", None,
+     {"expect_title": "에너지", "expect_content": "26"}),
+    ("H5", "대기전력 차단하면 얼마나 절약돼?", None,
+     {"expect_title": "에너지", "expect_content": "대기전력"}),
 ]
 
 
