@@ -295,6 +295,10 @@ def _load_from_db(db=None) -> list[dict]:
             session.close()
 
 
+# 폴더 안내문 등 자료가 아닌 파일은 인덱싱에서 제외한다 (seed_docs 와 동일 규칙)
+_IGNORED_STEMS = {"readme", "read_me", "notes", "메모"}
+
+
 def _extract_region(filename: str) -> str:
     """파일명에서 지역 코드를 추출한다.
 
@@ -334,6 +338,9 @@ def _load_from_files() -> list[dict]:
         folder.mkdir(parents=True, exist_ok=True)
         for path in sorted(folder.iterdir()):
             if not (path.is_file() and path.suffix.lower() in supported):
+                continue
+            # README·이력 문서 등은 검색 대상이 아니다 (seed_docs 의 제외 규칙과 동일)
+            if path.stem.lower() in _IGNORED_STEMS or path.stem.startswith("_"):
                 continue
 
             text = _read_file(path)
