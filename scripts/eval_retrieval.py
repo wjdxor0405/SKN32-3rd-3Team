@@ -127,6 +127,17 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
      {"expect_title": "에너지", "expect_content": "26"}),
     ("H5", "대기전력 차단하면 얼마나 절약돼?", None,
      {"expect_title": "에너지", "expect_content": "대기전력"}),
+    ("H6", "탄소중립 포인트제가 뭐야?", None,
+     {"expect_title": "탄소중립", "expect_content": "녹색생활"}),
+    ("H7", "탄소 발자국이 뭐야?", None,
+     {"expect_title": "탄소중립", "expect_content": "온실가스"}),
+    ("H8", "그린워싱이 뭐야? 어떻게 구별해?", None,
+     {"expect_title": "친환경", "expect_content": "인증"}),
+    ("H9", "무라벨 제품이 왜 좋은 거야?", None,
+     {"expect_title": "친환경", "expect_content": "재활용"}),
+    ("H10", "친환경 세제 추천해줘", None,
+     # 특정 상표가 아닌 '환경표지 마크 확인법'으로 답하는 설계 검증
+     {"expect_title": "친환경", "expect_content": "환경표지"}),
 ]
 
 
