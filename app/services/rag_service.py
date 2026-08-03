@@ -305,6 +305,9 @@ def _extract_region(filename: str) -> str:
     예) [가이드]_서울시_... → seoul
         [가이드]_천안시_... → cheonan
         [가이드]_부산남구_... → busan_namgu
+        [가이드]_세종시_... → sejong
+        [가이드]_인천미추홀구_... → incheon_michuhol
+        [가이드]_제주_... → jeju
         [가이드]_환경부_공통_... → common
     """
     REGION_MAP = {
@@ -312,6 +315,10 @@ def _extract_region(filename: str) -> str:
         "천안": "cheonan",
         "부산남구": "busan_namgu",
         "부산": "busan_namgu",
+        "세종": "sejong",
+        "미추홀": "incheon_michuhol",
+        "인천": "incheon_michuhol",
+        "제주": "jeju",
         "공통": "common",
         "환경부": "common",
     }

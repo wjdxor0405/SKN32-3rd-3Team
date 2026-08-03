@@ -70,13 +70,17 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
      {"expect_titles_all": ["부산", "서울"]}),
     # E. 무응답형 — 임계값(RAG_MIN_SCORE)이 걸러내는지
     ("E1", "제주도 분리배출 요일 알려줘", "jeju",
-     {"expect_empty": True}),
+     # 2026-08-03 제주 가이드 추가로 무응답형에서 응답형으로 전환.
+     # (이전: expect_empty — 제주가 코퍼스에 없음을 확인하던 자리)
+     {"expect_title": "제주", "expect_content": "요일"}),
     ("E2", "음식물처리기 구매 보조금 얼마 받을 수 있어?", None,
      {"expect_empty": True}),
     ("E3", "폐기물관리법 시행령 별표 8 내용 알려줘", None,
      {"forbid_title": "시행령"}),
     ("E4", "대형폐기물 수수료 얼마야?", None,
-     {"forbid_content": "수수료는 0"}),  # 금액이 코퍼스에 없음을 확인하는 자리표시
+     # 2026-08-03 대형폐기물 가이드 추가로 절차 답변이 가능해짐.
+     # 금액은 의도적으로 미수록(지자체별 상이) — 절차 근거가 잡히는지 확인
+     {"expect_title": "대형폐기물", "expect_content": "지자체"}),
     # F. 버전·인용 정합성
     ("F1", "재활용가능자원 분리수거 지침은 누가 정해?", None,
      {"expect_content": "정할 수 있다", "forbid_content": "정하여야 한다. <개정 2014. 1. 21., 2025. 10. 1., 2026. 2. 19.>"}),
@@ -85,6 +89,17 @@ GOLDEN: list[tuple[str, str, str | None, dict]] = [
     ("F3", "배달 용기 분리수거 어떻게 해?", None,
      # 별표 1(합성수지 용기·트레이류) 또는 가이드의 용기 배출 요령 중 하나면 정답
      {"expect_content": "내용물"}),
+    # G. 특수 배출 가이드형 (2026-08-03 신규 3종 대상)
+    ("G1", "장롱 버리려면 어떻게 해야 해?", None,
+     {"expect_title": "대형폐기물", "expect_content": "신고"}),
+    ("G2", "냉장고 버릴 때 돈 내야 해?", None,
+     {"expect_title": "무상방문수거", "expect_content": "1599-0903"}),
+    ("G3", "선풍기 하나만 버리고 싶은데 무상수거 되나?", None,
+     {"expect_title": "무상방문수거", "expect_content": "소형가전"}),
+    ("G4", "먹다 남은 약은 어디에 버려?", None,
+     {"expect_title": "유해폐기물", "expect_content": "폐의약품"}),
+    ("G5", "물약도 우체통에 넣어도 돼?", None,
+     {"expect_title": "유해폐기물", "expect_content": "우체통에는 넣지 말"}),
 ]
 
 

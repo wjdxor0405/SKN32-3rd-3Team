@@ -105,6 +105,9 @@ REGION_LABELS = {
     "seoul": "서울",
     "cheonan": "천안",
     "busan_namgu": "부산 남구",
+    "sejong": "세종",
+    "incheon_michuhol": "인천 미추홀구",
+    "jeju": "제주",
 }
 
 
